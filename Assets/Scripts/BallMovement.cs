@@ -51,10 +51,8 @@ public class BallMovement : MonoBehaviour
         Debug.Log("End: " + _endPositionValue);
 
         Vector2 difference = _endPositionValue - _startPositionValue;
-        float magnitude = difference.magnitude;
-        difference = difference.normalized;
 
-        Vector3 test = new Vector3(difference.x, 0, difference.y) * -magnitude;
+        Vector3 test = new Vector3(difference.x, 0, difference.y) * -1;
 
         _rb.AddForce(test);
     }
