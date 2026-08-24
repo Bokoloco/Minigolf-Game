@@ -11,6 +11,7 @@ public class BallMovement : MonoBehaviour
     private InputAction _leftMouseAction;
     private InputAction _positionAction;
 
+    //private BallPhysics _rb;
     private Rigidbody _rb;
 
     private LineRenderer _lineRenderer;
