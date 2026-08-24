@@ -33,10 +33,12 @@ public class BallMovement : MonoBehaviour
 
     private void Awake()
     {
+        // Find the correct action maps
         _actionMap = _actionAsset.FindActionMap("Player");
         _leftMouseAction = _actionMap.FindAction("LeftMouse");
         _positionAction = _actionMap.FindAction("MousePosition");
 
+        // Connect events to functions
         _leftMouseAction.started += StartVector;
         _leftMouseAction.canceled += EndVector;
     }
@@ -44,12 +46,12 @@ public class BallMovement : MonoBehaviour
     private void StartVector(InputAction.CallbackContext context)
     {
         _startPositionValue = _positionAction.ReadValue<Vector2>();
-
         _ShouldDrawLine = true;
 
+        // Make line visible
         _lineRenderer.enabled = true;
 
-        Debug.Log("Start: " + _startPositionValue);
+        //Debug.Log("Start: " + _startPositionValue);
     }
 
     private void EndVector(InputAction.CallbackContext context)
@@ -64,10 +66,10 @@ public class BallMovement : MonoBehaviour
 
         _ShouldDrawLine = false;
 
+        // Make line invisible
         _lineRenderer.enabled = false;
     }
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         _rb = GetComponent<Rigidbody>();
@@ -84,15 +86,15 @@ public class BallMovement : MonoBehaviour
 
         // Set the width
         _lineRenderer.startWidth = 0.02f;
-        _lineRenderer.endWidth = 0.01f;
+        _lineRenderer.endWidth = 0.002f;
 
         // Set the number of vertices
         _lineRenderer.positionCount = 2;
 
+        // Make line invisible
         _lineRenderer.enabled = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (_ShouldDrawLine)
