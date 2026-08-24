@@ -11,6 +11,9 @@ public class CameraMovement : MonoBehaviour
     private InputAction _rightMouseAction;
     private InputAction _deltaAction;
 
+    [SerializeField]
+    private Transform _lookAt;
+
     private Rigidbody _rb;
 
     private float _rightBtnValue;
@@ -33,7 +36,7 @@ public class CameraMovement : MonoBehaviour
         _rightMouseAction = _actionMap.FindAction("ShouldLook");
         _deltaAction = _actionMap.FindAction("Look");
 
-        _rb = GetComponent<Rigidbody>();
+        //_rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -49,7 +52,11 @@ public class CameraMovement : MonoBehaviour
         {
             Vector2 rotAmt = _deltaValue * 10 * Time.deltaTime;
             Quaternion deltaRotation = Quaternion.Euler(rotAmt.y, rotAmt.x, 0);
-            _rb.MoveRotation(_rb.rotation * deltaRotation);
+            //_rb.MoveRotation(_rb.rotation * deltaRotation);
         }
+
+        //transform.position = _lookAt.position;
+
+        transform.LookAt(_lookAt.parent);
     }
 }
