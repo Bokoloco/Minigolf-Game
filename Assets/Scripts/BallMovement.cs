@@ -5,6 +5,9 @@ using UnityEngine.InputSystem;
 
 public class BallMovement : MonoBehaviour
 {
+    
+    [SerializeField] private float _powerPerUnit = 2f;
+    
     [SerializeField]
     private InputActionAsset _actionAsset;
 
@@ -47,7 +50,7 @@ public class BallMovement : MonoBehaviour
 
     private void StartVector(InputAction.CallbackContext context)
     {
-        _startPositionValue = _positionAction.ReadValue<Vector3>();
+        _startPositionValue = _positionAction.ReadValue<Vector2>();
         _ShouldDrawLine = true;
 
         // Make line visible
@@ -56,23 +59,23 @@ public class BallMovement : MonoBehaviour
 
     private void EndVector(InputAction.CallbackContext context)
     {
-        _endPositionValue = _positionAction.ReadValue<Vector3>();
+        _endPositionValue = _positionAction.ReadValue<Vector2>();
 
-        Vector3 difference = _endPositionValue - _startPositionValue;
+        var groundPlane = new Plane(Vector3.up, transform.position);
+        Ray ray = Camera.main.ScreenPointToRay(_endPositionValue);
 
-        Vector3 worldPositionEnd = Camera.main.ScreenToWorldPoint(new Vector3(_endPositionValue.x, 0, _endPositionValue.y));
+        if (groundPlane.Raycast(ray, out float distance))
+        {
+            Vector3 worldPositionEnd = ray.GetPoint(distance);
+            Vector3 direction = transform.position - worldPositionEnd;
+            direction.y = 0;
+            
+            float forceMultiplier = direction.magnitude * _powerPerUnit; 
 
-        Vector3 direction = worldPositionEnd - transform.position;
-        direction.y = 0;
-        direction *= -1;
-
-        Debug.Log("Direction: " + direction);
-
-        _rb.AddForce(direction);
+            _rb.AddForce(direction.normalized * forceMultiplier, ForceMode.Impulse);
+        }
 
         _ShouldDrawLine = false;
-
-        // Make line invisible
         _lineRenderer.enabled = false;
     }
 
@@ -106,7 +109,7 @@ public class BallMovement : MonoBehaviour
         if (_ShouldDrawLine)
         {
             // Get screen position
-            var screenPosition = _positionAction.ReadValue<Vector3>();
+            var screenPosition = _positionAction.ReadValue<Vector2>();
 
             Debug.Log("Clip plane: " + Camera.main.nearClipPlane);
 
