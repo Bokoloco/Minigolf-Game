@@ -57,6 +57,6 @@ public class CameraMovement : MonoBehaviour
 
         //transform.position = _lookAt.position;
 
-        transform.LookAt(_lookAt.parent);
+        transform.LookAt(_lookAt);
     }
 }

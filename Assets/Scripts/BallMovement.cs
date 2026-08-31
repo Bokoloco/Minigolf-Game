@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -46,24 +47,28 @@ public class BallMovement : MonoBehaviour
 
     private void StartVector(InputAction.CallbackContext context)
     {
-        _startPositionValue = _positionAction.ReadValue<Vector2>();
+        _startPositionValue = _positionAction.ReadValue<Vector3>();
         _ShouldDrawLine = true;
 
         // Make line visible
         _lineRenderer.enabled = true;
-
-        //Debug.Log("Start: " + _startPositionValue);
     }
 
     private void EndVector(InputAction.CallbackContext context)
     {
-        _endPositionValue = _positionAction.ReadValue<Vector2>();
+        _endPositionValue = _positionAction.ReadValue<Vector3>();
 
-        Vector2 difference = _endPositionValue - _startPositionValue;
+        Vector3 difference = _endPositionValue - _startPositionValue;
 
-        Vector3 test = new Vector3(difference.x, 0, difference.y) * -1;
+        Vector3 worldPositionEnd = Camera.main.ScreenToWorldPoint(new Vector3(_endPositionValue.x, 0, _endPositionValue.y));
 
-        _rb.AddForce(test);
+        Vector3 direction = worldPositionEnd - transform.position;
+        direction.y = 0;
+        direction *= -1;
+
+        Debug.Log("Direction: " + direction);
+
+        _rb.AddForce(direction);
 
         _ShouldDrawLine = false;
 
@@ -101,7 +106,12 @@ public class BallMovement : MonoBehaviour
         if (_ShouldDrawLine)
         {
             // Get screen position
-            var screenPosition = _positionAction.ReadValue<Vector2>();
+            var screenPosition = _positionAction.ReadValue<Vector3>();
+
+            Debug.Log("Clip plane: " + Camera.main.nearClipPlane);
+
+            float distance = Vector3.Distance(transform.position, Camera.main.transform.position);
+            Debug.Log("Distance: " + distance);
 
             // Transform screen pos to world position
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, Camera.main.nearClipPlane));
