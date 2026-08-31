@@ -95,7 +95,7 @@ public class BallMovement : MonoBehaviour
 
         // Set the width
         _lineRenderer.startWidth = 0.02f;
-        _lineRenderer.endWidth = 0.002f;
+        _lineRenderer.endWidth = 0.02f;
 
         // Set the number of vertices
         _lineRenderer.positionCount = 2;
@@ -111,19 +111,25 @@ public class BallMovement : MonoBehaviour
             // Get screen position
             var screenPosition = _positionAction.ReadValue<Vector2>();
 
-            Debug.Log("Clip plane: " + Camera.main.nearClipPlane);
+            var groundPlane = new Plane(Vector3.up, transform.position);
+            Ray ray = Camera.main.ScreenPointToRay(screenPosition);
 
-            float distance = Vector3.Distance(transform.position, Camera.main.transform.position);
-            Debug.Log("Distance: " + distance);
+            if (groundPlane.Raycast(ray, out float distance))
+            {
+                Vector3 worldPosition = ray.GetPoint(distance);
+                Vector3 start = transform.position;
+
+                // Set the positions of the vertices
+                _lineRenderer.SetPosition(0, start);
+                _lineRenderer.SetPosition(1, worldPosition);
+            }
 
             // Transform screen pos to world position
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, Camera.main.nearClipPlane));
+            //Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, Camera.main.nearClipPlane));
             
-            Vector3 start = transform.position;
+            
 
-            // Set the positions of the vertices
-            _lineRenderer.SetPosition(0, start);
-            _lineRenderer.SetPosition(1, worldPosition);
+            
         }
     }
 }
