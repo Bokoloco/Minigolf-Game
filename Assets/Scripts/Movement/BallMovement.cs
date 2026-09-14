@@ -24,7 +24,9 @@ public class BallMovement : MonoBehaviour
     private Vector2 _startPositionValue;
     private Vector2 _endPositionValue;
 
-    private bool _ShouldDrawLine;
+    private bool _shouldDrawLine;
+
+    private int _strokeCount = 0;
 
     private void OnEnable()
     {
@@ -51,7 +53,7 @@ public class BallMovement : MonoBehaviour
     private void StartVector(InputAction.CallbackContext context)
     {
         _startPositionValue = _positionAction.ReadValue<Vector2>();
-        _ShouldDrawLine = true;
+        _shouldDrawLine = true;
 
         // Make line visible
         _lineRenderer.enabled = true;
@@ -75,8 +77,9 @@ public class BallMovement : MonoBehaviour
             _rb.AddForce(direction.normalized * forceMultiplier, ForceMode.Impulse);
         }
 
-        _ShouldDrawLine = false;
+        _shouldDrawLine = false;
         _lineRenderer.enabled = false;
+        ++_strokeCount;
     }
 
     void Start()
@@ -106,7 +109,7 @@ public class BallMovement : MonoBehaviour
 
     void Update()
     {
-        if (_ShouldDrawLine)
+        if (_shouldDrawLine)
         {
             // Get screen position
             var screenPosition = _positionAction.ReadValue<Vector2>();
@@ -123,13 +126,11 @@ public class BallMovement : MonoBehaviour
                 _lineRenderer.SetPosition(0, start);
                 _lineRenderer.SetPosition(1, worldPosition);
             }
-
-            // Transform screen pos to world position
-            //Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, Camera.main.nearClipPlane));
-            
-            
-
-            
         }
+    }
+
+    public int GetStrokeCount()
+    {
+        return _strokeCount;
     }
 }
