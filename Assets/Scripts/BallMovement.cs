@@ -70,7 +70,12 @@ public class BallMovement : MonoBehaviour
             Vector3 worldPositionEnd = ray.GetPoint(distance);
             Vector3 direction = transform.position - worldPositionEnd;
             direction.y = 0;
-            
+
+            Debug.Log("Direction before: " + direction.magnitude);
+
+            direction = Vector3.ClampMagnitude(direction, _maxPower);
+
+            Debug.Log("Direction after: " + direction.magnitude);
             float forceMultiplier = direction.magnitude * _powerPerUnit; 
 
             _rb.AddForce(direction.normalized * forceMultiplier, ForceMode.Impulse);
@@ -118,6 +123,10 @@ public class BallMovement : MonoBehaviour
             {
                 Vector3 worldPosition = ray.GetPoint(distance);
                 Vector3 start = transform.position;
+
+                Vector3 direction = worldPosition - start;
+                direction = Vector3.ClampMagnitude(direction, _maxPower);
+                worldPosition = start + direction;
 
                 // Set the positions of the vertices
                 _lineRenderer.SetPosition(0, start);
