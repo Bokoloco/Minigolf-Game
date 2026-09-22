@@ -16,6 +16,7 @@ public class BallMovement : MonoBehaviour
 
     private InputActionMap _actionMap;
     private InputAction _leftMouseAction;
+    private InputAction _rightMouseAction;
     private InputAction _positionAction;
 
     private Rigidbody _rb;
@@ -41,11 +42,14 @@ public class BallMovement : MonoBehaviour
         // Find the correct action maps
         _actionMap = _actionAsset.FindActionMap("Player");
         _leftMouseAction = _actionMap.FindAction("LeftMouse");
+        _rightMouseAction = _actionMap.FindAction("RightMouse");
         _positionAction = _actionMap.FindAction("MousePosition");
 
         // Connect events to functions
         _leftMouseAction.started += StartVector;
-        _leftMouseAction.canceled += EndVector;
+        _leftMouseAction.canceled += AddForce;
+
+        _rightMouseAction.started += StopVector;
 
         // Make groundplane for raycast
         _groundPlane = new Plane(Vector3.up, transform.position);
@@ -59,8 +63,17 @@ public class BallMovement : MonoBehaviour
         _lineRenderer.enabled = true;
     }
 
-    private void EndVector(InputAction.CallbackContext context)
+    private void StopVector(InputAction.CallbackContext context)
     {
+        _ShouldDrawLine = false;
+        _lineRenderer.enabled = false;
+    }
+
+    private void AddForce(InputAction.CallbackContext context)
+    {
+        if (!_ShouldDrawLine)
+            return;
+
         _endPositionValue = _positionAction.ReadValue<Vector2>();
 
         Ray ray = Camera.main.ScreenPointToRay(_endPositionValue);
@@ -71,11 +84,8 @@ public class BallMovement : MonoBehaviour
             Vector3 direction = transform.position - worldPositionEnd;
             direction.y = 0;
 
-            Debug.Log("Direction before: " + direction.magnitude);
-
             direction = Vector3.ClampMagnitude(direction, _maxPower);
 
-            Debug.Log("Direction after: " + direction.magnitude);
             float forceMultiplier = direction.magnitude * _powerPerUnit; 
 
             _rb.AddForce(direction.normalized * forceMultiplier, ForceMode.Impulse);

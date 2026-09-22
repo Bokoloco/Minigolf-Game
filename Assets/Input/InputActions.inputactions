@@ -7,7 +7,7 @@
             "id": "41b31a5e-1187-4b87-be1f-878bea1abb97",
             "actions": [
                 {
-                    "name": "ShouldLook",
+                    "name": "RightMouse",
                     "type": "Button",
                     "id": "dd925124-12b9-4a9c-885c-c9b48bd38d3d",
                     "expectedControlType": "",
@@ -51,7 +51,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "ShouldLook",
+                    "action": "RightMouse",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
