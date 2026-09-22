@@ -5,9 +5,12 @@ using UnityEngine.InputSystem;
 
 public class BallMovement : MonoBehaviour
 {
-    
-    [SerializeField] private float _powerPerUnit = 2f;
-    
+    [SerializeField]
+    private float _powerPerUnit = 2f;
+
+    [SerializeField]
+    private float _maxPower = 10f;
+
     [SerializeField]
     private InputActionAsset _actionAsset;
 
@@ -15,16 +18,13 @@ public class BallMovement : MonoBehaviour
     private InputAction _leftMouseAction;
     private InputAction _positionAction;
 
-    //private BallPhysics _rb;
     private Rigidbody _rb;
 
     private LineRenderer _lineRenderer;
 
-    private float _leftBtnValue;
-    private Vector2 _startPositionValue;
     private Vector2 _endPositionValue;
-
     private bool _ShouldDrawLine;
+    private Plane _groundPlane;
 
     private void OnEnable()
     {
@@ -46,11 +46,13 @@ public class BallMovement : MonoBehaviour
         // Connect events to functions
         _leftMouseAction.started += StartVector;
         _leftMouseAction.canceled += EndVector;
+
+        // Make groundplane for raycast
+        _groundPlane = new Plane(Vector3.up, transform.position);
     }
 
     private void StartVector(InputAction.CallbackContext context)
     {
-        _startPositionValue = _positionAction.ReadValue<Vector2>();
         _ShouldDrawLine = true;
 
         // Make line visible
@@ -61,10 +63,9 @@ public class BallMovement : MonoBehaviour
     {
         _endPositionValue = _positionAction.ReadValue<Vector2>();
 
-        var groundPlane = new Plane(Vector3.up, transform.position);
         Ray ray = Camera.main.ScreenPointToRay(_endPositionValue);
 
-        if (groundPlane.Raycast(ray, out float distance))
+        if (_groundPlane.Raycast(ray, out float distance))
         {
             Vector3 worldPositionEnd = ray.GetPoint(distance);
             Vector3 direction = transform.position - worldPositionEnd;
@@ -111,10 +112,9 @@ public class BallMovement : MonoBehaviour
             // Get screen position
             var screenPosition = _positionAction.ReadValue<Vector2>();
 
-            var groundPlane = new Plane(Vector3.up, transform.position);
             Ray ray = Camera.main.ScreenPointToRay(screenPosition);
 
-            if (groundPlane.Raycast(ray, out float distance))
+            if (_groundPlane.Raycast(ray, out float distance))
             {
                 Vector3 worldPosition = ray.GetPoint(distance);
                 Vector3 start = transform.position;
@@ -122,14 +122,7 @@ public class BallMovement : MonoBehaviour
                 // Set the positions of the vertices
                 _lineRenderer.SetPosition(0, start);
                 _lineRenderer.SetPosition(1, worldPosition);
-            }
-
-            // Transform screen pos to world position
-            //Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(screenPosition.x, screenPosition.y, Camera.main.nearClipPlane));
-            
-            
-
-            
+            }            
         }
     }
 }
