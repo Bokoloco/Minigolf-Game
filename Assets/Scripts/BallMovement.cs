@@ -57,6 +57,10 @@ public class BallMovement : MonoBehaviour
 
     private void StartVector(InputAction.CallbackContext context)
     {
+        // Check if ball is still moving
+        if (_rb.linearVelocity.magnitude > 0.1)
+            return;
+
         _ShouldDrawLine = true;
 
         // Make line visible
