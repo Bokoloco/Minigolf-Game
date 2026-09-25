@@ -4,7 +4,7 @@ public class EndHole : MonoBehaviour
 {
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("Hello?");
+        Debug.Log("Hello? " + collision.transform.name);
         if (collision.gameObject.tag.Equals("Ball"))
         {
             BallMovement _ballMovementComponent = collision.gameObject.GetComponent<BallMovement>();
