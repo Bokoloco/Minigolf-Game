@@ -24,7 +24,7 @@ public class BallMovement : MonoBehaviour
     private LineRenderer _lineRenderer;
 
     private Vector2 _endPositionValue;
-    private bool _ShouldDrawLine;
+    private bool _shouldDrawLine;
     private Plane _groundPlane;
 
     private void OnEnable()
@@ -61,21 +61,21 @@ public class BallMovement : MonoBehaviour
         if (_rb.linearVelocity.magnitude > 0.1)
             return;
 
-        _ShouldDrawLine = true;
-
         // Make line visible
+        _shouldDrawLine = true;
         _lineRenderer.enabled = true;
     }
 
     private void StopVector(InputAction.CallbackContext context)
     {
-        _ShouldDrawLine = false;
+        _shouldDrawLine = false;
         _lineRenderer.enabled = false;
     }
 
     private void AddForce(InputAction.CallbackContext context)
     {
-        if (!_ShouldDrawLine)
+        // No force needs to be added if right click was pressed
+        if (!_shouldDrawLine)
             return;
 
         _endPositionValue = _positionAction.ReadValue<Vector2>();
@@ -84,18 +84,21 @@ public class BallMovement : MonoBehaviour
 
         if (_groundPlane.Raycast(ray, out float distance))
         {
+            // Get world position and calculate the direction
             Vector3 worldPositionEnd = ray.GetPoint(distance);
             Vector3 direction = transform.position - worldPositionEnd;
             direction.y = 0;
 
+            // Clamp magnitude of the line so it can not go past the Max
             direction = Vector3.ClampMagnitude(direction, _maxPower);
 
+            // Calculate the force and apply it to the rigid body
             float forceMultiplier = direction.magnitude * _powerPerUnit; 
-
             _rb.AddForce(direction.normalized * forceMultiplier, ForceMode.Impulse);
         }
 
-        _ShouldDrawLine = false;
+        // Disable the line
+        _shouldDrawLine = false;
         _lineRenderer.enabled = false;
     }
 
@@ -126,7 +129,7 @@ public class BallMovement : MonoBehaviour
 
     void Update()
     {
-        if (_ShouldDrawLine)
+        if (_shouldDrawLine)
         {
             // Get screen position
             var screenPosition = _positionAction.ReadValue<Vector2>();
@@ -135,9 +138,11 @@ public class BallMovement : MonoBehaviour
 
             if (_groundPlane.Raycast(ray, out float distance))
             {
+                // Get the correct world and start position
                 Vector3 worldPosition = ray.GetPoint(distance);
                 Vector3 start = transform.position;
 
+                // Clamp magnitude of the line so it can not go past the Max
                 Vector3 direction = worldPosition - start;
                 direction = Vector3.ClampMagnitude(direction, _maxPower);
                 worldPosition = start + direction;
