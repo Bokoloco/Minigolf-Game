@@ -27,6 +27,8 @@ public class BallMovement : MonoBehaviour
     private bool _shouldDrawLine;
     private Plane _groundPlane;
 
+    private int _strokeCount = 0;
+
     private void OnEnable()
     {
         _actionAsset.Enable();
@@ -97,9 +99,9 @@ public class BallMovement : MonoBehaviour
             _rb.AddForce(direction.normalized * forceMultiplier, ForceMode.Impulse);
         }
 
-        // Disable the line
         _shouldDrawLine = false;
         _lineRenderer.enabled = false;
+        ++_strokeCount;
     }
 
     void Start()
@@ -150,7 +152,12 @@ public class BallMovement : MonoBehaviour
                 // Set the positions of the vertices
                 _lineRenderer.SetPosition(0, start);
                 _lineRenderer.SetPosition(1, worldPosition);
-            }            
+            }
         }
+    }
+
+    public int GetStrokeCount()
+    {
+        return _strokeCount;
     }
 }
